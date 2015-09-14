@@ -20,7 +20,8 @@ module.exports = {
   authorize: authorize,
   cannot: cannot,
   clear: clear,
-  can: can
+  can: can,
+  conditions: conditions
 };
 
 
@@ -70,16 +71,7 @@ function clear () {
  */
 
 function can (model, action, target) {
-  var config;
-
-  // find a configuration for a model
-  entityConfigs.forEach(function (item) {
-    // check if model is an instance of
-    // the current entity
-    if (model.constructor === item.entity) {
-      config = item.config;
-    }
-  });
+  var config = modelConfig(model);
 
   // no configuration found for
   // the current model, quit
@@ -121,6 +113,53 @@ function authorize () {
 
     throw err;
   }
+}
+
+/**
+ * Lookup the read conditions for a model
+ *
+ * @param  {Object} model  - class/entity instance
+ * @param  {Object} target - target instance
+ * @return {Object}
+ */
+
+function conditions (model, target) {
+  var config = modelConfig(model);
+
+  // no configuration found for
+  // the current model, quit
+  if (!config) {
+    return false;
+  }
+
+  // configure rules for
+  // this entity instance
+  var ability = new Ability();
+  config.call(ability, model);
+
+  // filter for relevant rules
+  var rules = ability.rules.filter(function (rule) {
+    return actionMatches('read', rule) &&
+           targetMatches(target, rule);
+  });
+
+  // no relevant rules found, quit
+  if (rules.length == 0) {
+    return false;
+  }
+
+  // collect conditions from relevant rules
+  var conditions = rules.reduce(function (conditions, rule) {
+    if (!isPlainObject(rule.attrs)) {
+      return conditions;
+    }
+
+    conditions.push(rule.attrs);
+    return conditions;
+  }, []);
+
+  // return the object or array of conditions
+  return conditions.length > 1 ? conditions : conditions[0];
 }
 
 
@@ -205,6 +244,26 @@ Ability.prototype.test = function test (action, target) {
 /**
  * Helpers
  */
+
+/**
+ * Lookup the configuration for an entity
+ *
+ * @param  {Object} model - class/entity instance
+ * @return {Object}
+ */
+
+function modelConfig(model) {
+  var config;
+  // find a configuration for a model
+  entityConfigs.forEach(function (item) {
+    // check if model is an instance of
+    // the current entity
+    if (model.constructor === item.entity) {
+      config = item.config;
+    }
+  });
+  return config;
+}
 
 /**
  * Test if action requirements are satisfied

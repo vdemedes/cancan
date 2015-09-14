@@ -10,6 +10,7 @@ const test = require('ava');
 const authorize = cancan.authorize;
 const cannot = cancan.cannot;
 const can = cancan.can;
+const conditions = cancan.conditions;
 
 
 /**
@@ -152,6 +153,36 @@ test ('allow permissions on classes', function (t) {
   let user = new User();
 
   t.true(can(user, 'read', Product));
+});
+
+test ('allow retrieval of conditions', function(t) {
+  t.plan(1);
+
+  cancan.clear();
+
+  cancan.configure(User, function(user) {
+    this.can('read', Product, { is_published: true });
+  });
+
+  let user = new User();
+
+  t.same(conditions(user, Product), { is_published: true });
+});
+
+test ('allow retrieval of conditions with multiple rules', function(t) {
+  t.plan(1);
+
+  cancan.clear();
+
+  cancan.configure(User, function(user) {
+    this.can('read', Product, { is_published: true });
+    this.can('read', Product, { author_id: user.id });
+  });
+
+  let user = new User();
+  user.id = 1;
+
+  t.same(conditions(user, Product), [{ is_published: true }, { author_id: 1 }]);
 });
 
 test ('throw an exception if permissions is not granted', function (t) {
