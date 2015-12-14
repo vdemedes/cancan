@@ -12,7 +12,7 @@
     "isarray": "0.0.1"
   },
   "devDependencies": {
-    "ava": "^0.7.0",
+    "ava": "^0.8.0",
     "coveralls": "^2.11.4",
     "eslint-config-vdemedes": "*",
     "nyc": "^4.0.1",
