@@ -15,7 +15,7 @@
     "ava": "^0.7.0",
     "coveralls": "^2.11.4",
     "eslint-config-vdemedes": "*",
-    "nyc": "^4.0.1",
+    "nyc": "^5.1.1",
     "xo": "^0.11.2"
   },
   "scripts": {
