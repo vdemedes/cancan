@@ -9,7 +9,7 @@
     "equals": "^1.0.0",
     "is-function": "^1.0.1",
     "is-plain-obj": "^1.0.0",
-    "isarray": "0.0.1"
+    "isarray": "1.0.0"
   },
   "devDependencies": {
     "ava": "^0.7.0",
