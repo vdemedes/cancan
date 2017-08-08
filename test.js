@@ -198,10 +198,10 @@ test('allow can depend of an optional payload', t => {
 	const {can, allow} = cancan;
 
 	allow(User, 'update', User, (user, target, payload) => {
-		return user.get('roles').includes('administrator') ||
+		return user.get('roles').indexOf('administrator') !== -1 ||
 			(
-				user.get('roles').includes('moderator') &&
-				payload && payload.fields && !payload.fields.includes('roles')
+				user.get('roles').indexOf('moderator') !== -1 &&
+				payload && payload.fields && payload.fields.indexOf('roles') === -1
 			);
 	});
 
