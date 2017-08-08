@@ -192,3 +192,24 @@ test('override instanceOf', t => {
 	t.false(cannot(user, 'read', product));
 	t.false(can(user, 'create', product));
 });
+
+test('allow can depend of an optional payload', t => {
+	const cancan = new CanCan();
+	const {can, allow} = cancan;
+
+	allow(User, 'update', User, (user, target, payload) => {
+		return user.get('roles').includes('administrator') ||
+			(
+				user.get('roles').includes('moderator') &&
+				payload && payload.fields && !payload.fields.includes('roles')
+			);
+	});
+
+	const admin = new User({roles: ['administrator']});
+	const moderator = new User({roles: ['moderator']});
+
+	t.false(can(moderator, 'update', moderator));
+	t.false(can(moderator, 'update', moderator, {fields: ['roles', 'username']}));
+	t.true(can(moderator, 'update', moderator, {fields: ['username']}));
+	t.true(can(admin, 'update', moderator, {fields: ['roles']}));
+});
