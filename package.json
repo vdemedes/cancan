@@ -5,6 +5,8 @@
   "author": "Vadim Demedes <vdemedes@gmail.com>",
   "license": "MIT",
   "repository": "vadimdemedes/cancan",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">= 4"
   },
@@ -12,7 +14,7 @@
     "test": "xo && ava"
   },
   "files": [
-    "index.js"
+    "index.js", "index.d.ts"
   ],
   "keywords": [
     "acl",
