@@ -1,7 +1,7 @@
 declare namespace CanCan {
     export interface Option {
-        instanceOf: <T, U>(instance: T, model: U) => boolean;
-        createError: () => any;
+        instanceOf?: <T, U>(instance: T, model: U) => boolean;
+        createError?: () => any;
     }
 }
 
