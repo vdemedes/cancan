@@ -13,7 +13,7 @@ declare class CanCan {
                        targets: U | U[] | string | string[],
                        condition?: any | (<T, U>(performer: T, target: U) => boolean)): void;
 
-    public can<T, U>(performer: T, action: string, target: U, payload?: any): boolean;
+    public can<T, U>(performer: T, action: string, target: U): boolean;
 
     public cannot<T, U>(performer: T, action: string, target: U): boolean;
 
