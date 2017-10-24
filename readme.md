@@ -95,7 +95,7 @@ allow(Editor, 'manage', Post);
 allow(AdminUser, 'manage', 'all');
 ```
 
-### can(instance, action, target[, payload])
+### can(instance, action, target[, options])
 
 Checks if the action is possible on `target` by `instance`.
 
@@ -117,7 +117,7 @@ Type: `object`
 
 Target against which the action would be performed.
 
-#### payload
+#### options
 
 Type: `object`
 
@@ -132,24 +132,25 @@ const post = new Post();
 can(user, 'view', post);
 ```
 
+With the use of 'options' parameter
 ```js
-/*
- * Authorization granted depending on updated fields
- * with optional payload parameter
- * /
 const admin = new User({roles: ['administrator']});
 const moderator = new User({roles: ['moderator']});
 
-can(admin, 'update', moderator, {fields: ["roles"]}); // true
-can(moderator, 'update', moderator, {fields: ["roles", "username"]}); // false
-can(moderator, 'update', moderator, {fields: ["username"]}); // true
+can(admin, 'update', moderator, {fields: ['roles']});
+//=> return true
+can(moderator, 'update', moderator, {fields: ['roles', 'username']});
+//=> return false
+can(moderator, 'update', moderator, {fields: ['username']});
+//=> return true
 ```
 
-### cannot(instance, action, target[, payload])
+
+### cannot(instance, action, target[, options])
 
 Inverse of `.can()`.
 
-### authorize(instance, action, target[, payload])
+### authorize(instance, action, target[, options])
 
 Same as `.can()`, but throws an error instead of returning `false`.
 

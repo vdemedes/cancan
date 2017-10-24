@@ -193,16 +193,25 @@ test('override instanceOf', t => {
 	t.false(can(user, 'create', product));
 });
 
-test('allow can depend of an optional payload', t => {
+test('pass options to the rule', t => {
 	const cancan = new CanCan();
 	const {can, allow} = cancan;
 
-	allow(User, 'update', User, (user, target, payload) => {
-		return user.get('roles').indexOf('administrator') !== -1 ||
-			(
-				user.get('roles').indexOf('moderator') !== -1 &&
-				payload && payload.fields && payload.fields.indexOf('roles') === -1
-			);
+	allow(User, 'update', User, (user, target, options) => {
+		const isAdministrator = user.get('roles').indexOf('administrator') !== -1;
+		const isModerator = user.get('roles').indexOf('moderator') !== -1;
+
+		const hasFieldsOption = (options && options.fields);
+		const hasRoleFieldUpdated = (hasFieldsOption && options.fields.indexOf('roles') !== -1);
+
+		if (isAdministrator) {
+			return true;
+		}
+		if (isModerator && hasFieldsOption && !hasRoleFieldUpdated) {
+			return true;
+		}
+
+		return false;
 	});
 
 	const admin = new User({roles: ['administrator']});
