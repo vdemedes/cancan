@@ -121,7 +121,7 @@ Target against which the action would be performed.
 
 Type: `object`
 
-Additional contextual informations against which the action would be performed.
+Additional data for the rule condition.
 
 Examples:
 
@@ -134,15 +134,30 @@ can(user, 'view', post);
 
 With the use of 'options' parameter
 ```js
-const admin = new User({roles: ['administrator']});
-const moderator = new User({roles: ['moderator']});
+const admin = new User({role: 'administrator'});
+const user = new User({role: 'user'});
 
-can(admin, 'update', moderator, {fields: ['roles']});
-//=> return true
-can(moderator, 'update', moderator, {fields: ['roles', 'username']});
-//=> return false
-can(moderator, 'update', moderator, {fields: ['username']});
-//=> return true
+allow(User, 'update', User, (user, target, options) => {
+	if (user.role === 'administrator') {
+		return true;
+	}
+	
+	// Don't let regular user update their role
+	if (user.role === 'user' && options.fields.includes('role')) {
+		return false;
+	}
+	
+	return true;
+});
+
+can(admin, 'update', user, {fields: ['role']);
+//=> true
+
+can(user, 'update', user, {fields: ['username']);
+//=> true
+
+can(user, 'update', user, {fields: ['role']);
+//=> false
 ```
 
 
