@@ -196,29 +196,24 @@ test('override instanceOf', t => {
 test('pass options to the rule', t => {
 	const cancan = new CanCan();
 	const {can, allow} = cancan;
+	
+	const admin = new User({role: 'administrator'});
+	const user = new User({role: 'user'});
 
 	allow(User, 'update', User, (user, target, options) => {
-		const isAdministrator = user.get('roles').indexOf('administrator') >= 0;
-		const isModerator = user.get('roles').indexOf('moderator') >= 0;
-
-		const wantsToUpdateRoles = options.fields && options.fields.indexOf('roles') >= 0;
-
-		if (isAdministrator) {
+		if (user.role === 'administrator') {
 			return true;
 		}
 
-		if (isModerator && wantsToUpdateRoles) {
+		// Don't let regular user update their role
+		if (user.role === 'user' && options.fields.includes('role')) {
 			return false;
 		}
 
 		return true;
 	});
 
-	const admin = new User({roles: ['administrator']});
-	const moderator = new User({roles: ['moderator']});
-
-	t.false(can(moderator, 'update', moderator));
-	t.false(can(moderator, 'update', moderator, {fields: ['roles', 'username']}));
-	t.true(can(moderator, 'update', moderator, {fields: ['username']}));
-	t.true(can(admin, 'update', moderator, {fields: ['roles']}));
+	t.true(can(admin, 'update', user, {fields: ['role']}));
+	t.true(can(user, 'update', user, {fields: ['username']}));
+	t.false(can(user, 'update', user, {fields: ['role']}));
 });
