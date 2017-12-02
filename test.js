@@ -196,7 +196,7 @@ test('override instanceOf', t => {
 test('pass options to the rule', t => {
 	const cancan = new CanCan();
 	const {can, allow} = cancan;
-	
+
 	const admin = new User({role: 'administrator'});
 	const user = new User({role: 'user'});
 
