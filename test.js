@@ -201,12 +201,12 @@ test('pass options to the rule', t => {
 	const user = new User({role: 'user'});
 
 	allow(User, 'update', User, (user, target, options) => {
-		if (user.role === 'administrator') {
+		if (user.get('role') === 'administrator') {
 			return true;
 		}
 
 		// Don't let regular user update their role
-		if (user.role === 'user' && options.fields.includes('role')) {
+		if (user.get('role') === 'user' && options.fields.includes('role')) {
 			return false;
 		}
 
