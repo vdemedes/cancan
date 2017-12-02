@@ -44,7 +44,7 @@ class CanCan {
 		});
 	}
 
-	can(performer, action, target, payload) {
+	can(performer, action, target, options) {
 		return this.abilities
 			.filter(ability => this.instanceOf(performer, ability.model))
 			.filter(ability => {
@@ -58,7 +58,7 @@ class CanCan {
 			})
 			.filter(ability => {
 				if (ability.condition) {
-					return ability.condition(performer, target, payload);
+					return ability.condition(performer, target, options || {});
 				}
 
 				return true;

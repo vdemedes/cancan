@@ -95,7 +95,7 @@ allow(Editor, 'manage', Post);
 allow(AdminUser, 'manage', 'all');
 ```
 
-### can(instance, action, target)
+### can(instance, action, target[, options])
 
 Checks if the action is possible on `target` by `instance`.
 
@@ -117,6 +117,12 @@ Type: `object`
 
 Target against which the action would be performed.
 
+#### options
+
+Type: `object`
+
+Additional data for the rule condition.
+
 Examples:
 
 ```js
@@ -126,11 +132,40 @@ const post = new Post();
 can(user, 'view', post);
 ```
 
-### cannot(instance, action, target)
+With the use of 'options' parameter
+```js
+const admin = new User({role: 'administrator'});
+const user = new User({role: 'user'});
+
+allow(User, 'update', User, (user, target, options) => {
+	if (user.role === 'administrator') {
+		return true;
+	}
+	
+	// Don't let regular user update their role
+	if (user.role === 'user' && options.fields.includes('role')) {
+		return false;
+	}
+	
+	return true;
+});
+
+can(admin, 'update', user, {fields: ['role']);
+//=> true
+
+can(user, 'update', user, {fields: ['username']);
+//=> true
+
+can(user, 'update', user, {fields: ['role']);
+//=> false
+```
+
+
+### cannot(instance, action, target[, options])
 
 Inverse of `.can()`.
 
-### authorize(instance, action, target)
+### authorize(instance, action, target[, options])
 
 Same as `.can()`, but throws an error instead of returning `false`.
 

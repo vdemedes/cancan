@@ -192,3 +192,28 @@ test('override instanceOf', t => {
 	t.false(cannot(user, 'read', product));
 	t.false(can(user, 'create', product));
 });
+
+test('pass options to the rule', t => {
+	const cancan = new CanCan();
+	const {can, allow} = cancan;
+
+	const admin = new User({role: 'administrator'});
+	const user = new User({role: 'user'});
+
+	allow(User, 'update', User, (user, target, options) => {
+		if (user.get('role') === 'administrator') {
+			return true;
+		}
+
+		// Don't let regular user update their role
+		if (user.get('role') === 'user' && options.fields.indexOf('role') >= 0) {
+			return false;
+		}
+
+		return true;
+	});
+
+	t.true(can(admin, 'update', user, {fields: ['role']}));
+	t.true(can(user, 'update', user, {fields: ['username']}));
+	t.false(can(user, 'update', user, {fields: ['role']}));
+});
