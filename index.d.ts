@@ -11,9 +11,9 @@ declare class CanCan {
     public allow<T, U>(model: T,
                        actions: string | string[],
                        targets: U | U[] | string | string[],
-                       condition?: any | (<T, U>(performer: T, target: U) => boolean)): void;
+                       condition?: any | (<T, U, V>(performer: T, target: U, options?: V) => boolean)): void;
 
-    public can<T, U>(performer: T, action: string, target: U): boolean;
+    public can<T, U, V>(performer: T, action: string, target: U, options?: V): boolean;
 
     public cannot<T, U>(performer: T, action: string, target: U): boolean;
 
