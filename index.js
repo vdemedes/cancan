@@ -58,7 +58,7 @@ class CanCan {
 			})
 			.filter(ability => {
 				if (ability.condition) {
-					return ability.condition(performer, target, options);
+					return ability.condition(performer, target, options || {});
 				}
 
 				return true;
