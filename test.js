@@ -206,7 +206,7 @@ test('pass options to the rule', t => {
 		}
 
 		// Don't let regular user update their role
-		if (user.get('role') === 'user' && options.fields.includes('role')) {
+		if (user.get('role') === 'user' && options.fields.indexOf('role') >= 0) {
 			return false;
 		}
 
