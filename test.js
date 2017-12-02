@@ -207,7 +207,7 @@ test('pass options to the rule', t => {
 			return true;
 		}
 
-		if (isModerator && wantsToUpdateRules) {
+		if (isModerator && wantsToUpdateRoles) {
 			return false;
 		}
 
