@@ -198,20 +198,20 @@ test('pass options to the rule', t => {
 	const {can, allow} = cancan;
 
 	allow(User, 'update', User, (user, target, options) => {
-		const isAdministrator = user.get('roles').indexOf('administrator') !== -1;
-		const isModerator = user.get('roles').indexOf('moderator') !== -1;
+		const isAdministrator = user.get('roles').indexOf('administrator') >= 0;
+		const isModerator = user.get('roles').indexOf('moderator') >= 0;
 
-		const hasFieldsOption = (options && options.fields);
-		const hasRoleFieldUpdated = (hasFieldsOption && options.fields.indexOf('roles') !== -1);
+		const wantsToUpdateRoles = options.fields && options.fields.indexOf('roles') >= 0;
 
 		if (isAdministrator) {
 			return true;
 		}
-		if (isModerator && hasFieldsOption && !hasRoleFieldUpdated) {
-			return true;
+
+		if (isModerator && wantsToUpdateRules) {
+			return false;
 		}
 
-		return false;
+		return true;
 	});
 
 	const admin = new User({roles: ['administrator']});
