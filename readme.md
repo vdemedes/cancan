@@ -134,6 +134,11 @@ can(user, 'view', post);
 
 With the use of 'options' parameter
 ```js
+class User {
+  constructor(options) {
+    this.role = options.role;
+  }
+}
 const admin = new User({role: 'administrator'});
 const user = new User({role: 'user'});
 
@@ -141,22 +146,22 @@ allow(User, 'update', User, (user, target, options) => {
 	if (user.role === 'administrator') {
 		return true;
 	}
-	
+
 	// Don't let regular user update their role
 	if (user.role === 'user' && options.fields.includes('role')) {
 		return false;
 	}
-	
+
 	return true;
 });
 
-can(admin, 'update', user, {fields: ['role']);
+can(admin, 'update', user, {fields: ['role']});
 //=> true
 
-can(user, 'update', user, {fields: ['username']);
+can(user, 'update', user, {fields: ['username']});
 //=> true
 
-can(user, 'update', user, {fields: ['role']);
+can(user, 'update', user, {fields: ['role']});
 //=> false
 ```
 
