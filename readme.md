@@ -134,11 +134,6 @@ can(user, 'view', post);
 
 With the use of 'options' parameter
 ```js
-class User {
-  constructor(options) {
-    this.role = options.role;
-  }
-}
 const admin = new User({role: 'administrator'});
 const user = new User({role: 'user'});
 
