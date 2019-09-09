@@ -217,3 +217,51 @@ test('pass options to the rule', t => {
 	t.true(can(user, 'update', user, {fields: ['username']}));
 	t.false(can(user, 'update', user, {fields: ['role']}));
 });
+
+test('wait for promise to resolve', t => {
+	const cancan = new CanCan();
+	const {can, allow} = cancan;
+
+	const follower = new User({id: 1});
+	const nonFollower = new User({id: 2});
+
+	const data = new Promise(resolve => resolve([follower]));
+	const product = new Product({followers: () => data});
+
+	allow(User, 'view', Product, (user, target) => {
+		console.log(target);
+		return target.followers().then(allowed => {
+			if (allowed.map(u => u.id).indexOf(user.id) > -1) {
+				return true;
+			}
+			return false;
+		});
+	});
+
+	t.true(can(follower, 'view', product));
+	t.false(can(nonFollower, 'view', product));
+});
+
+test('resolve async/await promises', t => {
+	const cancan = new CanCan();
+	const {can, allow} = cancan;
+
+	const follower = new User({id: 1});
+	const nonFollower = new User({id: 2});
+
+	const data = new Promise(resolve => resolve([follower]));
+	const product = new Product({followers: async () => data});
+
+	allow(User, 'view', Product, async (user, target) => {
+		const allowed = await target.followers();
+
+		if (allowed.map(u => u.id).indexOf(user.id) > -1) {
+			return true;
+		}
+
+		return false;
+	});
+
+	t.true(can(follower, 'view', product));
+	t.false(can(nonFollower, 'view', product));
+});
