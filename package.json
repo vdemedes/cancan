@@ -21,7 +21,8 @@
   "dependencies": {
     "arrify": "^1.0.1",
     "auto-bind": "^1.1.0",
-    "is-plain-obj": "^1.1.0"
+    "is-plain-obj": "^1.1.0",
+    "p-iteration": "^1.1.8"
   },
   "devDependencies": {
     "ava": "^0.19.1",

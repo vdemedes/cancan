@@ -217,3 +217,51 @@ test('pass options to the rule', t => {
 	t.true(can(user, 'update', user, {fields: ['username']}));
 	t.false(can(user, 'update', user, {fields: ['role']}));
 });
+
+test('wait for promise to resolve', async t => {
+	const cancan = new CanCan();
+	const {aCan, allow} = cancan;
+
+	const follower = new User({id: 1});
+	const nonFollower = new User({id: 2});
+
+	const data = new Promise(resolve => resolve([follower]));
+	const product = new Product({followers: () => data});
+
+	allow(User, 'view', Product, (user, target) => {
+		return target.get('followers')().then(allowed => {
+			if (allowed.map(u => u.get('id')).indexOf(user.get('id')) > -1) {
+				return true;
+			}
+			return false;
+		});
+	});
+
+	const canView = await aCan(follower, 'view', product);
+	const cannotView = await aCan(nonFollower, 'view', product);
+	t.true(canView);
+	t.false(cannotView);
+});
+
+test('resolve async/await promises', async t => {
+	const cancan = new CanCan();
+	const {aCan, aCannot, allow} = cancan;
+
+	const follower = new User({id: 1});
+	const nonFollower = new User({id: 2});
+
+	const product = new Product({followers: async () => [follower]});
+
+	allow(User, 'view', Product, async (user, target) => {
+		const allowed = await target.get('followers')();
+
+		if (allowed.map(u => u.get('id')).indexOf(user.get('id')) > -1) {
+			return true;
+		}
+
+		return false;
+	});
+
+	t.true(await aCan(follower, 'view', product));
+	t.true(await aCannot(nonFollower, 'view', product));
+});

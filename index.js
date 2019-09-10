@@ -3,6 +3,7 @@
 const isObject = require('is-plain-obj');
 const autoBind = require('auto-bind');
 const arrify = require('arrify');
+const {filter} = require('p-iteration');
 
 const get = (obj, key) => typeof obj.get === 'function' ? obj.get(key) : obj[key];
 
@@ -68,6 +69,36 @@ class CanCan {
 
 	cannot() {
 		return !this.can.apply(this, arguments);
+	}
+
+	async aCan(performer, action, target, options) {
+		const validation = await this.abilities
+			.filter(ability => this.instanceOf(performer, ability.model))
+			.filter(ability => {
+				return ability.target === 'all' ||
+					target === ability.target ||
+					this.instanceOf(target, ability.target);
+			})
+			.filter(ability => {
+				return ability.action === 'manage' ||
+					action === ability.action;
+			})
+
+		const asyncValidation = await filter(validation, async(ability) => {
+			if (ability.condition) {
+				const valid = await ability.condition(performer, target, options || {});
+				return valid;
+			}
+
+			return true;
+		});
+
+		return asyncValidation.length > 0;
+	}
+
+	async aCannot() {
+		const cancan = await this.aCan(arguments);
+		return !cancan;
 	}
 
 	authorize() {
