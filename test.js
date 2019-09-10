@@ -218,9 +218,9 @@ test('pass options to the rule', t => {
 	t.false(can(user, 'update', user, {fields: ['role']}));
 });
 
-test('wait for promise to resolve', t => {
+test('wait for promise to resolve', async t => {
 	const cancan = new CanCan();
-	const {can, allow} = cancan;
+	const {aCan, allow} = cancan;
 
 	const follower = new User({id: 1});
 	const nonFollower = new User({id: 2});
@@ -229,39 +229,39 @@ test('wait for promise to resolve', t => {
 	const product = new Product({followers: () => data});
 
 	allow(User, 'view', Product, (user, target) => {
-		console.log(target);
-		return target.followers().then(allowed => {
-			if (allowed.map(u => u.id).indexOf(user.id) > -1) {
+		return target.get('followers')().then(allowed => {
+			if (allowed.map(u => u.get('id')).indexOf(user.get('id')) > -1) {
 				return true;
 			}
 			return false;
 		});
 	});
 
-	t.true(can(follower, 'view', product));
-	t.false(can(nonFollower, 'view', product));
+	const canView = await aCan(follower, 'view', product);
+	const cannotView = await aCan(nonFollower, 'view', product);
+	t.true(canView);
+	t.false(cannotView);
 });
 
-test('resolve async/await promises', t => {
+test('resolve async/await promises', async t => {
 	const cancan = new CanCan();
-	const {can, allow} = cancan;
+	const {aCan, aCannot, allow} = cancan;
 
 	const follower = new User({id: 1});
 	const nonFollower = new User({id: 2});
 
-	const data = new Promise(resolve => resolve([follower]));
-	const product = new Product({followers: async () => data});
+	const product = new Product({followers: async () => [follower]});
 
 	allow(User, 'view', Product, async (user, target) => {
-		const allowed = await target.followers();
+		const allowed = await target.get('followers')();
 
-		if (allowed.map(u => u.id).indexOf(user.id) > -1) {
+		if (allowed.map(u => u.get('id')).indexOf(user.get('id')) > -1) {
 			return true;
 		}
 
 		return false;
 	});
 
-	t.true(can(follower, 'view', product));
-	t.false(can(nonFollower, 'view', product));
+	t.true(await aCan(follower, 'view', product));
+	t.true(await aCannot(nonFollower, 'view', product));
 });
